@@ -26,6 +26,46 @@ Real-world music recommenders like Spotify combine collaborative filtering (anal
 
 ---
 
+### Finalized Algorithm Recipe
+
+For each song in the catalog, `score_song()` computes a weighted similarity score:
+
+**Step 1 — Categorical features** (genre, mood):
+- If the song's value matches the user's preference → score `1.0`, otherwise `0.0`
+
+**Step 2 — Numeric features** (energy, acousticness, valence, tempo_bpm, danceability):
+- Per-feature similarity = `1 - abs(user_value - song_value)`
+- `tempo_bpm` must be normalized first: `tempo_normalized = tempo_bpm / 200`
+
+**Step 3 — Apply weights** and compute the final score:
+
+| Feature | Weight | Reason |
+|---|---|---|
+| `mood` | 2.0 | Strongest vibe signal — directly reflects how a song feels |
+| `energy` | 1.5 | Primary numeric separator between intense and chill tracks |
+| `acousticness` | 1.5 | Cleanly divides electric/distorted from organic/mellow sounds |
+| `genre` | 1.0 | Useful broad anchor, but one genre can span many moods |
+| `tempo_bpm` | 1.0 | Supporting signal for pace |
+| `valence` | 1.0 | Supporting signal for emotional brightness |
+| `danceability` | 0.5 | Weakest differentiator in this catalog |
+
+```
+final_score = Σ(feature_score × weight) / Σ(all weights)
+```
+
+`recommend_songs()` collects `(song_dict, score, explanation)` for every song, sorts by score descending, and returns the top `k` results.
+
+---
+
+### Potential Biases
+
+- **Mood can overshadow genre**: Because mood has double the weight of genre, a song with a matching mood but mismatched genre (e.g., a pop/intense track for a rock user) may outscore a rock/chill song. Great genre matches can be buried if the mood is off.
+- **Small catalog amplifies gaps**: With only 10 songs, underrepresented genres (ambient, jazz, synthwave each appear once) will almost never rank highly for users who don't prefer them, even if numeric features are a close match.
+- **Numeric features assume a single ideal point**: The formula rewards songs closest to the user's target values. A user who enjoys *both* high-energy and chill tracks depending on context cannot be represented — the profile only captures one vibe at a time.
+- **tempo_bpm normalization is fragile**: Dividing by 200 works for this dataset (max BPM is 152), but would silently break if songs with BPM > 200 were added without updating the divisor.
+
+---
+
 ## Getting Started
 
 ### Setup
