@@ -61,29 +61,23 @@ Prompts:
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+**Mood weight dominates genre preference, creating hidden filter bubbles.** During testing with the High-Energy Pop profile, I discovered that Rooftop Lights (indie pop, happy) ranked higher than Gym Hero (pop, intense), despite Gym Hero being an exact genre match. Both songs have similar energy (0.76 vs 0.93), but because mood is weighted 2.0 and genre only 1.0, indie pop's matching mood (happy) outweighed pop's exact genre match. This means users cannot reliably explore adjacent genres—if they want to discover music "similar to pop but with a different vibe," the system will never surface it competitively, even when all numeric features align. Real-world harm: users get locked into mood stereotypes within their favorite genres and never encounter cross-genre diversity, reinforcing echo chambers. The 10-song catalog amplifies this: underrepresented genres like ambient, jazz, and synthwave (one song each) are nearly invisible to users who don't explicitly prefer them, even if a song's numeric features are a perfect match.  
 
 ---
 
 ## 7. Evaluation  
 
-How you checked whether the recommender behaved as expected. 
+I tested three distinct user profiles: **Profile A (Deep Intense Rock)**, **Profile B (High-Energy Pop)**, and **Profile C (Chill Lofi)**, spanning opposite ends of the energy spectrum and different genres.
 
-Prompts:  
+**What I looked for:** I checked whether the #1 recommendation made sense for each profile, whether exact category matches (genre + mood) dominated, and whether numeric features (energy, tempo, acousticness) could compensate for a mismatch.
 
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
+**What I found:**
+- **Profile A (rock/intense)**: Storm Runner scored 0.99—perfect match on all 7 features. No surprises, exactly expected behavior.
+- **Profile B (pop/happy)**: Sunrise City ranked #1 (0.98), which made sense. But Rooftop Lights (indie pop, happy) ranked #2, beating Gym Hero (pop, intense) at #3. *This surprised me*—I expected the exact genre match (pop) to dominate, but happy mood's 2.0 weight overwhelmed pop genre's 1.0 weight. This revealed the hidden bias in mood dominance.
+- **Profile C (lofi/chill)**: Library Rain and Midnight Coding tied at 0.98—both are lofi/chill with nearly identical numeric features. This exposed a limitation: the system cannot distinguish between two songs that perfectly match a profile. It's an honest reflection of the data, not a bug, but it creates ties that feel boring.
 
-No need for numeric metrics unless you created some.
+**Surprise #1:** Mood weighting overwhelms genre—users looking for a specific genre with a different mood will never see it ranked highly.
+**Surprise #2:** Small catalog gaps create impossible users—there's no "ambient intense" or "relaxed rock" song to recommend, so users with those combinations fall off a cliff in ranking.
 
 ---
 

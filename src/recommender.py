@@ -5,6 +5,13 @@ from dataclasses import dataclass
 # Feature weights used by score_song().
 # Mood is 2x genre because it is a stronger vibe signal —
 # one genre can span many moods, but mood directly reflects feel.
+#
+# Copilot Inline Chat prompt used to audit these weights:
+# "Given this WEIGHTS dict where mood=2.0, energy=1.5, acousticness=1.5,
+#  and genre=1.0, explain step by step why Storm Runner scores 0.99 for a
+#  profile with genre='rock', mood='intense', energy=0.90, acousticness=0.08,
+#  tempo_bpm=148. Show the per-feature weighted calculation and identify
+#  which single weight contributed most to the final score."
 WEIGHTS: Dict[str, float] = {
     "mood":         2.0,
     "energy":       1.5,
